@@ -35,32 +35,85 @@ DESCRIPTION
         automatically in this case.
 
     *   shows with the 'status' command if an instance is already running
-        and which PID it has.
+        and which PID it has:
+
+            ./my-app status
+            Pid file:    /tmp/tt.pid
+            Pid in file: 14914
+            Running:     no
+            Name match:  0
+
+  Actions
+    "App::Daemon" recognizes three different actions:
+
+    my-app start
+        will start up the daemon. "start" itself is optional, as this is the
+        default action,
+
+                $ ./my-app
+        
+        will also run the 'start' action. If the -X option is given, the
+        program is run in foreground mode for testing purposes.
+
+    stop
+        will find the daemon's PID in the pidfile and send it a kill signal.
+        It won't verify if this actually shut down the daemon or if it's
+        immune to the kill signal.
+
+    status
+        will print out diagnostics on what the status of the daemon is.
+        Typically, the output look like this:
+
+            Pid file:    /tmp/tt.pid
+            Pid in file: 15562
+            Running:     yes
+            Name match:  1
+                /usr/local/bin/perl -w test.pl
+
+        This indicates that the pidfile says that the daemon has PID 15562
+        and that a process with this PID is actually running at this moment.
+        Also, a name grep on the process name in the process table results
+        in 1 match, according to the output above.
+
+        Note that the name match is unreliable, as it just looks for a
+        command line that looks approximately like the script itself. So if
+        the script is "test.pl", it will match lines like "perl -w test.pl"
+        or "perl test.pl start", but unfortunately also lines like "vi
+        test.pl".
+
+        If the process is no longer running, the status output might look
+        like this instead:
+
+            Pid file:    /tmp/tt.pid
+            Pid in file: 14914
+            Running:     no
+            Name match:  0
 
   Command line options
-    -X  Foreground mode. Log messages go to the screen.
+        -X  Foreground mode. Log messages go to the screen.
 
-    -l logfile
-        Logfile to send Log4perl messages to in background mode. Defaults to
-        "/tmp/[appname].log".
+        -l logfile
+            Logfile to send Log4perl messages to in background mode.
+            Defaults to "/tmp/[appname].log".
 
-    -u as_user
-        User to run as if started as root. Defaults to 'nobody'.
+        -u as_user
+            User to run as if started as root. Defaults to 'nobody'.
 
-    -l4p l4p.conf
-        Path to Log4perl configuration file.
+        -l4p l4p.conf
+            Path to Log4perl configuration file.
 
-    -p pidfile
-        Where to save the pid of the started process. Defaults to
-        "/tmp/[appname].pid".
+        -p pidfile
+            Where to save the pid of the started process. Defaults to
+            "/tmp/[appname].pid".
 
 AUTHOR
-    Mike Schilli, cpan@perlmeister.com
+        Mike Schilli, cpan@perlmeister.com
 
 COPYRIGHT AND LICENSE
-    Copyright (C) 2008 by Mike Schilli
+        Copyright (C) 2008 by Mike Schilli
 
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself, either Perl version 5.8.5 or, at
-    your option, any later version of Perl 5 you may have available.
+        This library is free software; you can redistribute it and/or modify
+        it under the same terms as Perl itself, either Perl version 5.8.5
+        or, at your option, any later version of Perl 5 you may have
+        available.
 

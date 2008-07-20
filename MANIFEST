@@ -1,7 +1,9 @@
+.cvsignore
 adm/release
 Changes
 Daemon.pm
 Makefile.PL
 MANIFEST
 README
+t/001Basic.t
 t/App-Daemon.t

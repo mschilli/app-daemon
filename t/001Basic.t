@@ -1,15 +1,33 @@
-# Before `make install' is performed this script should be runnable with
-# `make test'. After `make install' it should work as `perl App-Daemon.t'
+use Test::More tests => 4;
 
-#########################
+use App::Daemon qw(daemonize cmd_line_parse);
+use File::Temp qw(tempfile);
 
-# change 'tests => 1' to 'tests => last_test_to_print';
+my($fh, $tempfile) = tempfile();
+my($pf, $pidfile) = tempfile();
 
-use Test::More tests => 1;
-BEGIN { use_ok('App::Daemon') };
+ok(1, "loaded ok");
 
-#########################
+open(OLDERR, ">&STDERR");
+open(STDERR, ">$tempfile");
 
-# Insert your test code below, the Test::More module is use()ed here so read
-# its man page ( perldoc Test::More ) for help writing this test script.
+@ARGV = ("-X", "-p", $pidfile);
+daemonize();
 
+close STDERR;
+open(STDERR, ">&OLDERR");
+
+ok(1, "running in foreground with -X");
+
+open PIDFILE, "<$pidfile";
+my $pid = <PIDFILE>;
+chomp $pid;
+close PIDFILE;
+
+is($pid, $$, "check pid");
+
+open FILE, "<$tempfile";
+my $data = join '', <FILE>;
+close FILE;
+
+like($data, qr/Written to $pidfile/, "log message");

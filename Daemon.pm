@@ -14,6 +14,7 @@ use POSIX;
 use Exporter;
 use Fcntl qw/:flock/;
 
+our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(daemonize cmd_line_parse);
 
 our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
@@ -29,24 +30,15 @@ sub cmd_line_parse {
         pod2usage();
     }
 
-    $pidfile    = def_or(
-                    find_option('-p'), 
-                    '/tmp/' . $appname . ".pid"
-                  );
-    $logfile    = def_or(
-                    find_option('-l'), 
-                    '/tmp/' . $appname . ".log"
-                  );
-    $l4p_conf   = def_or(
-                    find_option('-l4p'), 
-                    undef
-                  );
-    $as_user    = def_or(
-                    find_option('-u'), 
-                    "nobody"
-                  );
+    $pidfile    = find_option('-p', 1) || ( '/tmp/' . $appname . ".pid" );
+
+    $logfile    = find_option('-l', 1) || ( '/tmp/' . $appname . ".log" );
+
+    $l4p_conf   = find_option('-l4p', 1);
+
+    $as_user    = find_option('-u', 1) || "nobody";
     $background = find_option('-X') ? 0 : 1,
-    $loglevel   = find_option('-v') ? $DEBUG : $ERROR;
+    $loglevel   = find_option('-v') ? $DEBUG : $INFO;
     $loglevel   = $DEBUG if !$background;
 
     for (qw(start stop status)) {
@@ -70,7 +62,7 @@ sub cmd_line_parse {
     }
 
     if(!$background) {
-        INFO "Running in foreground";
+        DEBUG "Running in foreground";
     }
 }
 
@@ -230,7 +222,8 @@ sub find_option {
     for my $argv (@ARGV) {
         if($argv eq $opt) {
             if( $has_arg ) {
-                return splice @ARGV, $idx, 2;
+                my @args = splice @ARGV, $idx, 2;
+                return $args[1];
             } else {
                 return splice @ARGV, $idx, 1;
             }
@@ -268,7 +261,7 @@ sub pid_file_read {
     open FILE, "<$pidfile" or LOGDIE "Cannot open pidfile $pidfile";
     flock FILE, LOCK_SH;
     my $pid = <FILE>;
-    chomp $pid;
+    chomp $pid if defined $pid;
     close FILE;
     return $pid;
 }
@@ -385,6 +378,12 @@ This indicates that the pidfile says that the daemon has PID 15562 and
 that a process with this PID is actually running at this moment. Also,
 a name grep on the process name in the process table results in 1 match,
 according to the output above.
+
+Note that the name match is unreliable, as it just looks for a command line
+that looks approximately like the script itself. So if the script is
+C<test.pl>, it will match lines like "perl -w test.pl" or 
+"perl test.pl start", but unfortunately also lines like 
+"vi test.pl".
 
 If the process is no longer running, the status output might look like
 this instead:
