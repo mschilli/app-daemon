@@ -1,7 +1,6 @@
 adm/release
 Changes
 Daemon.pm
-lib/App/Daemon.pm
 Makefile.PL
 MANIFEST
 README
