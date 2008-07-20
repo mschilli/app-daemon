@@ -1,0 +1,8 @@
+adm/release
+Changes
+Daemon.pm
+lib/App/Daemon.pm
+Makefile.PL
+MANIFEST
+README
+t/App-Daemon.t

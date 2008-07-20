@@ -1,0 +1,66 @@
+######################################################################
+    App::Daemon 0.01
+######################################################################
+
+NAME
+    App::Daemon - Start an Application as a Daemon
+
+SYNOPSIS
+         # Program:
+       use App::Daemon qw( daemonize );
+       daemonize();
+
+         # Then, in the shell:
+ 
+         # start app in background
+       $ app start
+
+         # stop app
+       $ app stop
+
+         # start app in foreground (for testing)
+       $ app -X
+
+         # show if app is currently running
+       $ app status
+
+DESCRIPTION
+    "App::Daemon" helps running an application as a daemon. Along with the
+    common features offered by similar modules on CPAN, it
+
+    *   supports logging with Log4perl: In background mode, it logs to a
+        logfile. In foreground mode, log messages go directly to the screen.
+
+    *   detects if another instance is already running and ends itself
+        automatically in this case.
+
+    *   shows with the 'status' command if an instance is already running
+        and which PID it has.
+
+  Command line options
+    -X  Foreground mode. Log messages go to the screen.
+
+    -l logfile
+        Logfile to send Log4perl messages to in background mode. Defaults to
+        "/tmp/[appname].log".
+
+    -u as_user
+        User to run as if started as root. Defaults to 'nobody'.
+
+    -l4p l4p.conf
+        Path to Log4perl configuration file.
+
+    -p pidfile
+        Where to save the pid of the started process. Defaults to
+        "/tmp/[appname].pid".
+
+AUTHOR
+    Mike Schilli, cpan@perlmeister.com
+
+COPYRIGHT AND LICENSE
+    Copyright (C) 2008 by Mike Schilli
+
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
+
