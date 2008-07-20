@@ -7,17 +7,17 @@ our $VERSION = '0.01';
 use Getopt::Std;
 use Pod::Usage;
 use Log::Log4perl qw(:easy);
-use File::Pid;
 use File::Basename;
 use Proc::ProcessTable;
 use Log::Log4perl qw(:easy);
 use POSIX;
 use Exporter;
+use Fcntl qw/:flock/;
 
 our @EXPORT_OK = qw(daemonize cmd_line_parse);
 
 our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
-     $loglevel, $pf, $action, $appname);
+     $loglevel, $action, $appname);
 $action  = "";
 $appname = appname();
 
@@ -63,7 +63,8 @@ sub cmd_line_parse {
     if( $l4p_conf ) {
         Log::Log4perl->init( $l4p_conf );
     } elsif( !$background ) {
-        Log::Log4perl->easy_init( $loglevel );
+        Log::Log4perl->easy_init({ level => $loglevel, 
+                                   layout => "%F{1}-%L: %m%n" });
     } elsif( $logfile ) {
         Log::Log4perl->easy_init({ level => $loglevel, file => ">>$logfile" });
     }
@@ -84,21 +85,19 @@ sub daemonize {
         LOGDIE "$pidfile not writable by user $name";
     }
     
-    $pf = File::Pid->new({ file => $pidfile });
-
     if($action eq "status") {
         status();
         exit 0;
     }
 
     if($action eq "stop" or $action eq "restart") {
-        if(-f $pidfile and $pf) {
-            my $pid = $pf->pid();
+        if(-f $pidfile) {
+            my $pid = pid_file_read();
             if(kill 0, $pid) {
                 kill 2, $pid;
             } else {
                 ERROR "Process $pid not running\n";
-                $pf->remove or die "Can't remove $pidfile ($!)";
+                unlink $pidfile or die "Can't remove $pidfile ($!)";
             }
         } else {
             ERROR "According to my pidfile, there's no instance ",
@@ -111,7 +110,7 @@ sub daemonize {
         }
     }
       
-    if ( my $num = $pf->running ) {
+    if ( my $num = pid_file_process_running() ) {
         LOGDIE "Already running: $num (pidfile=$pidfile)\n";
     }
 
@@ -119,7 +118,7 @@ sub daemonize {
         if( my $child = fork() ) {
             # parent doesn't do anything
             sleep 1;
-            exit;
+            exit 0;
         }
     
             # child does all processing, but first needs to detach
@@ -134,14 +133,12 @@ sub daemonize {
 
     $SIG{__DIE__} = sub { 
         if(! $^S) {
-            $pf->remove or warn "Cannot remove $pidfile" 
+            unlink $pidfile or warn "Cannot remove $pidfile";
         }
     };
     
     INFO "Process ID is $$";
-    $pf = File::Pid->new({ file => $pidfile });
-    $pf->pid($$);
-    $pf->write() or die "Cannot write $pidfile";
+    pid_file_write($$);
     INFO "Written to $pidfile";
 
     return 1;
@@ -165,14 +162,17 @@ sub status {
 ###########################################
     print "Pid file:    $pidfile\n";
     if(-f $pidfile) {
-        my $pid = $pf->pid();
+        my $pid = pid_file_read();
         print "Pid in file: $pid\n";
         print "Running:     ", process_running($pid) ? "yes" : "no", "\n";
     } else {
         print "No pidfile found\n";
     }
-    print "Name match:  ", nof_processes_running_by_name( $appname ),
-          "\n";
+    my @cmdlines = processes_running_by_name( $appname );
+    print "Name match:  ", scalar @cmdlines, "\n";
+    for(@cmdlines) {
+        print "    ", $_, "\n";
+    }
     return 1;
 }
 
@@ -194,22 +194,23 @@ sub process_running {
 }
 
 ###########################################
-sub nof_processes_running_by_name {
+sub processes_running_by_name {
 ###########################################
     my($name) = @_;
 
     $name = basename($name);
+    my @procs = ();
 
     my $t = Proc::ProcessTable->new();
-    my $count = 0;
 
     foreach my $p ( @{$t->table} ){
         if($p->cmndline() =~ /\b\Q${name}\E\b/) {
             next if $p->pid() == $$;
-            $count++;
+            DEBUG "Match: ", $p->cmndline();
+            push @procs, $p->cmndline();
         }
     }
-    return $count;
+    return @procs;
 }
 
 ###########################################
@@ -247,6 +248,46 @@ sub def_or {
     if(! defined $_[0]) {
         $_[0] = $_[1];
     }
+}
+
+###########################################
+sub pid_file_write {
+###########################################
+    my($pid) = @_;
+
+    open FILE, "+>$pidfile" or LOGDIE "Cannot open pidfile $pidfile";
+    flock FILE, LOCK_EX;
+    seek(FILE, 0, 0);
+    print FILE "$pid\n";
+    close FILE;
+}
+
+###########################################
+sub pid_file_read {
+###########################################
+    open FILE, "<$pidfile" or LOGDIE "Cannot open pidfile $pidfile";
+    flock FILE, LOCK_SH;
+    my $pid = <FILE>;
+    chomp $pid;
+    close FILE;
+    return $pid;
+}
+
+###########################################
+sub pid_file_process_running {
+###########################################
+    if(! -f $pidfile) {
+        return undef;
+    }
+    my $pid = pid_file_read();
+    if(! $pid) {
+        return undef;
+    }
+    if(process_running($pid)) {
+        return $pid;
+    }
+
+    return undef;
 }
 
 1;
@@ -297,9 +338,61 @@ automatically in this case.
 =item *
 
 shows with the 'status' command if an instance is already running
-and which PID it has.
+and which PID it has:
+
+    ./my-app status
+    Pid file:    /tmp/tt.pid
+    Pid in file: 14914
+    Running:     no
+    Name match:  0
 
 =back
+
+=head2 Actions
+
+C<App::Daemon> recognizes three different actions:
+
+=over 4
+
+=item my-app start
+
+will start up the daemon. "start" itself is optional, as this is the 
+default action, 
+        
+        $ ./my-app
+        
+will also run the 'start' action. If the -X option is given, the program
+is run in foreground mode for testing purposes.
+
+=item stop
+
+will find the daemon's PID in the pidfile and send it a kill signal. It
+won't verify if this actually shut down the daemon or if it's immune to 
+the kill signal.
+
+=item status
+
+will print out diagnostics on what the status of the daemon is. Typically,
+the output look like this:
+
+    Pid file:    /tmp/tt.pid
+    Pid in file: 15562
+    Running:     yes
+    Name match:  1
+        /usr/local/bin/perl -w test.pl
+
+This indicates that the pidfile says that the daemon has PID 15562 and
+that a process with this PID is actually running at this moment. Also,
+a name grep on the process name in the process table results in 1 match,
+according to the output above.
+
+If the process is no longer running, the status output might look like
+this instead:
+
+    Pid file:    /tmp/tt.pid
+    Pid in file: 14914
+    Running:     no
+    Name match:  0
 
 =head2 Command line options
 

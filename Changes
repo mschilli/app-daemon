@@ -1,6 +1,4 @@
 Revision history for Perl extension App::Daemon.
 
-0.01  Sat Jul 19 18:19:28 2008
-	- original version; created by h2xs 1.23 with options
-		-AXn App::Daemon
-
+0.01 07/19/2008
+    (ms) Where it all began.
