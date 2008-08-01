@@ -1,4 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
+0.02 08/01/2008
+    (ms) Added setting logfile and pidfile within the script itself, as
+    suggested by Kimo Rosenbaum.
+
 0.01 07/19/2008
     (ms) Where it all began.

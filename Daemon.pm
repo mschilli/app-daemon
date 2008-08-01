@@ -30,16 +30,30 @@ sub cmd_line_parse {
         pod2usage();
     }
 
-    $pidfile    = find_option('-p', 1) || ( '/tmp/' . $appname . ".pid" );
+    if(!defined $pidfile) {
+      $pidfile    = find_option('-p', 1) || ( '/tmp/' . $appname . ".pid" );
+    }
 
-    $logfile    = find_option('-l', 1) || ( '/tmp/' . $appname . ".log" );
+    if(!defined $logfile) {
+      $logfile    = find_option('-l', 1) || ( '/tmp/' . $appname . ".log" );
+    }
 
-    $l4p_conf   = find_option('-l4p', 1);
+    if(!defined $l4p_conf) {
+      $l4p_conf   = find_option('-l4p', 1);
+    }
 
-    $as_user    = find_option('-u', 1) || "nobody";
-    $background = find_option('-X') ? 0 : 1,
-    $loglevel   = find_option('-v') ? $DEBUG : $INFO;
-    $loglevel   = $DEBUG if !$background;
+    if(!defined $as_user) {
+      $as_user    = find_option('-u', 1) || "nobody";
+    }
+
+    if(!defined $background) {
+      $background = find_option('-X') ? 0 : 1,
+    }
+
+    if(!defined $loglevel) {
+      $loglevel   = find_option('-v') ? $DEBUG : $INFO;
+      $loglevel   = $DEBUG if !$background;
+    }
 
     for (qw(start stop status)) {
         if( find_option( $_ ) ) {
@@ -418,6 +432,25 @@ Path to Log4perl configuration file.
 
 Where to save the pid of the started process.
 Defaults to C</tmp/[appname].pid>.
+
+=head2 Setting Parameters
+
+Instead of setting paramteters like the logfile, the pidfile etc. from
+the command line, you can directly manipulate App::Daemon's global
+variables:
+
+    use App::Daemon qw(daemonize);
+
+    $App::Daemon::logfile    = "mylog.log";
+    $App::Daemon::pidfile    = "mypid.log";
+    $App::Daemon::l4p_conf   = "myconf.l4p";
+    $App::Daemon::background = 1;
+    $App::Daemon::as_user    = "nobody";
+
+    use Log::Log4perl qw(:levels);
+    $App::Daemon::loglevel   = $DEBUG;
+
+    daemonize();
 
 =back
 

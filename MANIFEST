@@ -6,4 +6,4 @@ Makefile.PL
 MANIFEST
 README
 t/001Basic.t
-t/App-Daemon.t
+t/002Params.t

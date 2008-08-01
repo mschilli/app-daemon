@@ -106,6 +106,24 @@ DESCRIPTION
             Where to save the pid of the started process. Defaults to
             "/tmp/[appname].pid".
 
+  Setting Parameters
+            Instead of setting paramteters like the logfile, the pidfile
+            etc. from the command line, you can directly manipulate
+            App::Daemon's global variables:
+
+                use App::Daemon qw(daemonize);
+
+                $App::Daemon::logfile    = "mylog.log";
+                $App::Daemon::pidfile    = "mypid.log";
+                $App::Daemon::l4p_conf   = "myconf.l4p";
+                $App::Daemon::background = 1;
+                $App::Daemon::as_user    = "nobody";
+
+                use Log::Log4perl qw(:levels);
+                $App::Daemon::loglevel   = $DEBUG;
+
+                daemonize();
+
 AUTHOR
         Mike Schilli, cpan@perlmeister.com
 
