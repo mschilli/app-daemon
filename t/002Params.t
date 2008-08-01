@@ -18,6 +18,7 @@ daemonize();
 
 close STDERR;
 open(STDERR, ">&OLDERR");
+close OLDERR;
 
 ok(1, "running in foreground");
 
