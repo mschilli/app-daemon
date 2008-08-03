@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Daemon.
 
+0.03 08/03/2008
+    (ms) Fixed test suite for Freebsd, which locks tempfiles 
+         exclusively. Thanks to to CPAN tester Slaven Rezic.
+    (ms) Removed restriction on perl-5.8.
+
 0.02 08/01/2008
     (ms) Added setting logfile and pidfile within the script itself, as
     suggested by Kimo Rosenbaum.

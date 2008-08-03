@@ -2,9 +2,14 @@ use Test::More tests => 4;
 
 use App::Daemon qw(daemonize cmd_line_parse);
 use File::Temp qw(tempfile);
+use Fcntl qw/:flock/;
 
 my($fh, $tempfile) = tempfile();
 my($pf, $pidfile) = tempfile();
+
+# Turdix locks temp files, so unlock them just in case
+flock $fh, LOCK_UN;
+flock $pf, LOCK_UN;
 
 ok(1, "loaded ok");
 
