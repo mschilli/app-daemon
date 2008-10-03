@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Daemon.
 
+0.04 10/02/2008
+    (ms) Fixed logfile permissions if daemon starts up at root and
+         then drops priviledges. Added docs.
+
 0.03 08/03/2008
     (ms) Fixed test suite for Freebsd, which locks tempfiles 
          exclusively. Thanks to to CPAN tester Slaven Rezic.

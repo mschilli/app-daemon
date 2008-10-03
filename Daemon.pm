@@ -46,6 +46,11 @@ sub cmd_line_parse {
       $as_user    = find_option('-u', 1) || "nobody";
     }
 
+    if($> != 0) {
+          # Not root? Then we're ourselves
+        ($as_user) = getpwuid($>);
+    }
+
     if(!defined $background) {
       $background = find_option('-X') ? 0 : 1,
     }
@@ -72,7 +77,15 @@ sub cmd_line_parse {
         Log::Log4perl->easy_init({ level => $loglevel, 
                                    layout => "%F{1}-%L: %m%n" });
     } elsif( $logfile ) {
-        Log::Log4perl->easy_init({ level => $loglevel, file => ">>$logfile" });
+        my $levelstring = Log::Log4perl::Level::to_level( $loglevel );
+        Log::Log4perl->init(\ qq{
+            log4perl.logger = $levelstring, FileApp
+            log4perl.appender.FileApp = Log::Log4perl::Appender::File
+            log4perl.appender.FileApp.filename = $logfile
+            log4perl.appender.FileApp.owner    = $as_user
+            log4perl.appender.FileApp.layout   = PatternLayout
+            log4perl.appender.FileApp.layout.ConversionPattern = %d %m%n
+        });
     }
 
     if(!$background) {
@@ -451,6 +464,31 @@ variables:
     $App::Daemon::loglevel   = $DEBUG;
 
     daemonize();
+
+=head2 Gotchas
+
+If the process is started as root but later drops permissions to a
+non-priviledged user for security purposes, it's important that 
+logfiles are created with correct permissions.
+
+If they're created as root when the program starts, the non-priviledged
+user won't be able to write to them later (unless they're world-writable
+which is also undesirable because of security concerns).
+
+The best strategy to handle this case is to specify the non-priviledged
+user as the owner of the logfile in the Log4perl configuration:
+
+    log4perl.logger = DEBUG, FileApp
+    log4perl.appender.FileApp = Log::Log4perl::Appender::File
+    log4perl.appender.FileApp.filename = /var/log/foo-app.log
+    log4perl.appender.FileApp.owner    = nobody
+    log4perl.appender.FileApp.layout   = PatternLayout
+    log4perl.appender.FileApp.layout.ConversionPattern = %d %m%n
+
+This way, the process starts up as root, creates the logfile if it 
+doesn't exist yet, and changes its owner to 'nobody'. Later, when the
+process assumes the identity of the user 'nobody', it will continue
+to write to the logfile without permission problems.
 
 =back
 
