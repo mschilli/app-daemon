@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Daemon.
 
+0.05 10/09/2008
+    (ms) Better docs as requested by Tim Appnel
+    (ms) (not yet done) 
+         Better __DIE__ handler as suggested by Karl Rune Nilsen in
+         http://rt.cpan.org/Ticket/Display.html?id=39917.
+
 0.04 10/02/2008
     (ms) Fixed logfile permissions if daemon starts up at root and
          then drops priviledges. Added docs.

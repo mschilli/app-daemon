@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -323,13 +323,15 @@ App::Daemon - Start an Application as a Daemon
      # Program:
    use App::Daemon qw( daemonize );
    daemonize();
+   do_something_useful(); # your application
 
-     # Then, in the shell:
- 
-     # start app in background
+     # Then, in the shell: start application,
+     # which returns immediately, but continues 
+     # to run do_something_useful() in the background
    $ app start
+   $
 
-     # stop app
+     # stop application
    $ app stop
 
      # start app in foreground (for testing)
@@ -340,7 +342,23 @@ App::Daemon - Start an Application as a Daemon
 
 =head1 DESCRIPTION
 
-C<App::Daemon> helps running an application as a daemon. Along with the
+C<App::Daemon> helps running an application as a daemon. The idea is
+that you prepend your script with the 
+
+    use App::Daemon qw( daemonize ); 
+    daemonize();
+
+and 'daemonize' it that way. That means, that if you write
+
+    use App::Daemon qw( daemonize ); 
+
+    daemonize();
+    sleep(10);
+
+you'll get a script that, when called from the command line, returns 
+immediatly, but continues to run as a daemon for 10 seconds.
+
+Along with the
 common features offered by similar modules on CPAN, it
 
 =over 4
