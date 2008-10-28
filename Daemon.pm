@@ -438,7 +438,7 @@ this instead:
     Running:     no
     Name match:  0
 
-=head2 Command line options
+=head2 Command Line Options
 
 =over 4
 
@@ -482,6 +482,27 @@ variables:
     $App::Daemon::loglevel   = $DEBUG;
 
     daemonize();
+
+=head2 Application-specific command line options
+
+If an application needs additional command line options, it can 
+use whatever is not yet taken by App::Daemon, as described previously
+in the L<Command Line Options> section.
+
+However, it needs to make sure to remove these additional options before
+calling daemonize(), or App::Daemon will complain. To do this, create 
+an options hash C<%opts> and store application-specific options in there
+while removing them from @ARGV:
+
+    my %opts = ();
+
+    for my $opt (qw(k P U)) {
+        my $v = App::Daemon::find_option( $opt, 1 );
+        $opts{ $opt } = $v if defined $v;
+    }
+
+After this, options C<-k>, C<-P>, and C<-U> will have disappeared from
+@ARGV and can be checked in C<$opts{k}>, C<$opts{P}>, and C<$opts{U}>.
 
 =head2 Gotchas
 
