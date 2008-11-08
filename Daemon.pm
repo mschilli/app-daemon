@@ -134,17 +134,26 @@ sub daemonize {
     }
 
     if( $background ) {
-        if( my $child = fork() ) {
+        umask(0);
+
+        my $child = fork();
+
+        if($child < 0) {
+            LOGDIE "Fork failed ($!)";
+        }
+
+        if( $child ) {
             # parent doesn't do anything
-            sleep 1;
             exit 0;
         }
     
-            # child does all processing, but first needs to detach
-            # from parent;
-        user_switch();
+            # Become the session leader of a new session, become the
+            # process group leader of a new process group.
         POSIX::setsid();
-            # properly daemonize
+
+        user_switch();
+
+            # close std file descriptors
         close(STDIN);
         close(STDOUT);
         close(STDERR);

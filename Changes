@@ -7,6 +7,8 @@ Revision history for Perl extension App::Daemon.
 0.05 (not yet released)
     (ms) Better docs as requested by Tim Appnel
     (ms) docs on application-specific command line options
+    (ms) Better daemonization according to Stevens (Advanced Programming
+         in the UNIX environment)
 
 0.04 10/02/2008
     (ms) Fixed logfile permissions if daemon starts up at root and
