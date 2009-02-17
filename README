@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.04
+    App::Daemon 0.05
 ######################################################################
 
 NAME
@@ -9,13 +9,15 @@ SYNOPSIS
          # Program:
        use App::Daemon qw( daemonize );
        daemonize();
+       do_something_useful(); # your application
 
-         # Then, in the shell:
- 
-         # start app in background
+         # Then, in the shell: start application,
+         # which returns immediately, but continues 
+         # to run do_something_useful() in the background
        $ app start
+       $
 
-         # stop app
+         # stop application
        $ app stop
 
          # start app in foreground (for testing)
@@ -25,8 +27,23 @@ SYNOPSIS
        $ app status
 
 DESCRIPTION
-    "App::Daemon" helps running an application as a daemon. Along with the
-    common features offered by similar modules on CPAN, it
+    "App::Daemon" helps running an application as a daemon. The idea is that
+    you prepend your script with the
+
+        use App::Daemon qw( daemonize ); 
+        daemonize();
+
+    and 'daemonize' it that way. That means, that if you write
+
+        use App::Daemon qw( daemonize ); 
+
+        daemonize();
+        sleep(10);
+
+    you'll get a script that, when called from the command line, returns
+    immediatly, but continues to run as a daemon for 10 seconds.
+
+    Along with the common features offered by similar modules on CPAN, it
 
     *   supports logging with Log4perl: In background mode, it logs to a
         logfile. In foreground mode, log messages go directly to the screen.
@@ -89,7 +106,7 @@ DESCRIPTION
             Running:     no
             Name match:  0
 
-  Command line options
+  Command Line Options
         -X  Foreground mode. Log messages go to the screen.
 
         -l logfile
@@ -123,6 +140,28 @@ DESCRIPTION
                 $App::Daemon::loglevel   = $DEBUG;
 
                 daemonize();
+
+  Application-specific command line options
+            If an application needs additional command line options, it can
+            use whatever is not yet taken by App::Daemon, as described
+            previously in the "Command Line Options" section.
+
+            However, it needs to make sure to remove these additional
+            options before calling daemonize(), or App::Daemon will
+            complain. To do this, create an options hash %opts and store
+            application-specific options in there while removing them from
+            @ARGV:
+
+                my %opts = ();
+
+                for my $opt (qw(k P U)) {
+                    my $v = App::Daemon::find_option( $opt, 1 );
+                    $opts{ $opt } = $v if defined $v;
+                }
+
+            After this, options "-k", "-P", and "-U" will have disappeared
+            from @ARGV and can be checked in $opts{k}, $opts{P}, and
+            $opts{U}.
 
   Gotchas
             If the process is started as root but later drops permissions to

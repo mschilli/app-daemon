@@ -136,6 +136,10 @@ sub daemonize {
     if( $background ) {
         umask(0);
 
+          # Make sure the child isn't killed when the uses closes the
+          # terminal session before the child detaches from the tty.
+        $SIG{'HUP'} = 'IGNORE';
+
         my $child = fork();
 
         if($child < 0) {
@@ -160,7 +164,8 @@ sub daemonize {
     }
 
     $SIG{__DIE__} = sub { 
-        if(! $^S) {
+          # Make sure it's not an eval{} triggering the handler.
+        if(defined $^S && $^S==0) {
             unlink $pidfile or warn "Cannot remove $pidfile";
         }
     };

@@ -1,14 +1,14 @@
 Revision history for Perl extension App::Daemon.
 
-    (ms) (not yet done) 
-         Better __DIE__ handler as suggested by Karl Rune Nilsen in
-         http://rt.cpan.org/Ticket/Display.html?id=39917.
-
-0.05 (not yet released)
+0.05 (02/17/2009)
     (ms) Better docs as requested by Tim Appnel
     (ms) docs on application-specific command line options
     (ms) Better daemonization according to Stevens (Advanced Programming
          in the UNIX environment)
+    (ms) Make sure the child isn't killed by a closed session before
+         it is able to detach from the tty.
+    (ms) Better __DIE__ handler as suggested by Karl Rune Nilsen in
+         http://rt.cpan.org/Ticket/Display.html?id=39917.
 
 0.04 10/02/2008
     (ms) Fixed logfile permissions if daemon starts up at root and

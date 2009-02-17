@@ -2,6 +2,7 @@
 adm/release
 Changes
 Daemon.pm
+eg/test-daemon
 Makefile.PL
 MANIFEST
 README
