@@ -190,6 +190,19 @@ DESCRIPTION
             will continue to write to the logfile without permission
             problems.
 
+  Detach only
+            If you want to create a daemon without the fancy command line
+            parsing and PID file checking functions, use
+
+                use App::Daemon qw(detach);
+                detach();
+                # ... some code here
+
+            This will fork a child, terminate the parent and detach the
+            child from the terminal. Issued from the command line, the
+            program above will continue to run the code following the
+            detach() call but return to the shell prompt immediately.
+
 AUTHOR
         Mike Schilli, cpan@perlmeister.com
 

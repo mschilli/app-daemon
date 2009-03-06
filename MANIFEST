@@ -3,6 +3,7 @@ adm/release
 Changes
 Daemon.pm
 eg/test-daemon
+eg/test-detach
 Makefile.PL
 MANIFEST
 README

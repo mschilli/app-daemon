@@ -1,0 +1,11 @@
+#!/usr/local/bin/perl -w
+use strict;
+
+     # Program:
+use App::Daemon qw( detach );
+detach();
+sleep(5);
+
+open FILE, ">foo.txt" or die;
+print FILE "Waaah!\n";
+close FILE;

@@ -15,7 +15,7 @@ use Exporter;
 use Fcntl qw/:flock/;
 
 our @ISA = qw(Exporter);
-our @EXPORT_OK = qw(daemonize cmd_line_parse);
+our @EXPORT_OK = qw(daemonize cmd_line_parse detach);
 
 our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
      $loglevel, $action, $appname);
@@ -134,33 +134,7 @@ sub daemonize {
     }
 
     if( $background ) {
-        umask(0);
-
-          # Make sure the child isn't killed when the uses closes the
-          # terminal session before the child detaches from the tty.
-        $SIG{'HUP'} = 'IGNORE';
-
-        my $child = fork();
-
-        if($child < 0) {
-            LOGDIE "Fork failed ($!)";
-        }
-
-        if( $child ) {
-            # parent doesn't do anything
-            exit 0;
-        }
-    
-            # Become the session leader of a new session, become the
-            # process group leader of a new process group.
-        POSIX::setsid();
-
-        user_switch();
-
-            # close std file descriptors
-        close(STDIN);
-        close(STDOUT);
-        close(STDERR);
+        detach( $as_user );
     }
 
     $SIG{__DIE__} = sub { 
@@ -175,6 +149,42 @@ sub daemonize {
     INFO "Written to $pidfile";
 
     return 1;
+}
+
+###########################################
+sub detach {
+###########################################
+    my($as_user) = @_;
+
+    umask(0);
+ 
+      # Make sure the child isn't killed when the uses closes the
+      # terminal session before the child detaches from the tty.
+    $SIG{'HUP'} = 'IGNORE';
+ 
+    my $child = fork();
+ 
+    if($child < 0) {
+        LOGDIE "Fork failed ($!)";
+    }
+ 
+    if( $child ) {
+        # parent doesn't do anything
+        exit 0;
+    }
+ 
+        # Become the session leader of a new session, become the
+        # process group leader of a new process group.
+    POSIX::setsid();
+ 
+    if($as_user) {
+        user_switch();
+    }
+ 
+        # close std file descriptors
+    close(STDIN);
+    close(STDOUT);
+    close(STDERR);
 }
 
 ###########################################
@@ -542,6 +552,20 @@ This way, the process starts up as root, creates the logfile if it
 doesn't exist yet, and changes its owner to 'nobody'. Later, when the
 process assumes the identity of the user 'nobody', it will continue
 to write to the logfile without permission problems.
+
+=head2 Detach only
+
+If you want to create a daemon without the fancy command line parsing
+and PID file checking functions, use
+
+    use App::Daemon qw(detach);
+    detach();
+    # ... some code here
+
+This will fork a child, terminate the parent and detach the child from
+the terminal. Issued from the command line, the program above will
+continue to run the code following the detach() call but return to the
+shell prompt immediately.
 
 =back
 

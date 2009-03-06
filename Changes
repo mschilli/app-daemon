@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
+0.06 (03/05/2009)
+    (ms) Added detach() as an importable method for simple daemons.
+
 0.05 (02/17/2009)
     (ms) Better docs as requested by Tim Appnel
     (ms) docs on application-specific command line options
