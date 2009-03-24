@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -71,7 +71,9 @@ sub cmd_line_parse {
         $background = 0;
     }
 
-    if( $l4p_conf ) {
+    if( Log::Log4perl->initialized() ) {
+        DEBUG "Log4perl already initialized, doing nothing";
+    } elsif( $l4p_conf ) {
         Log::Log4perl->init( $l4p_conf );
     } elsif( !$background ) {
         Log::Log4perl->easy_init({ level => $loglevel, 
@@ -481,12 +483,19 @@ User to run as if started as root. Defaults to 'nobody'.
 
 =item -l4p l4p.conf
 
-Path to Log4perl configuration file.
+Path to Log4perl configuration file. Note that in this case the -v option 
+will be ignored.
 
 =item -p pidfile
 
 Where to save the pid of the started process.
 Defaults to C</tmp/[appname].pid>.
+
+=item -v
+
+Increase default Log4perl verbosity from $INFO to $DEBUG. Note that this
+option will be ignored if Log4perl is initialized independently or if
+a user-provided Log4perl configuration file is used.
 
 =head2 Setting Parameters
 

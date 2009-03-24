@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Daemon.
 
+0.07 (03/24/2009)
+    (ms) Applied patch by Sadrak [rt:44513] to check if Log4perl has
+         already been initialized and skip the easy_init call in this
+         case. Note that -v then has to be handled by the user-provided 
+         Log4perl configuration instead.
+
 0.06 (03/05/2009)
     (ms) Added detach() as an importable method for simple daemons.
 

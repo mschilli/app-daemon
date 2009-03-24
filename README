@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.06
+    App::Daemon 0.07
 ######################################################################
 
 NAME
@@ -117,11 +117,17 @@ DESCRIPTION
             User to run as if started as root. Defaults to 'nobody'.
 
         -l4p l4p.conf
-            Path to Log4perl configuration file.
+            Path to Log4perl configuration file. Note that in this case the
+            -v option will be ignored.
 
         -p pidfile
             Where to save the pid of the started process. Defaults to
             "/tmp/[appname].pid".
+
+        -v  Increase default Log4perl verbosity from $INFO to $DEBUG. Note
+            that this option will be ignored if Log4perl is initialized
+            independently or if a user-provided Log4perl configuration file
+            is used.
 
   Setting Parameters
             Instead of setting paramteters like the logfile, the pidfile
