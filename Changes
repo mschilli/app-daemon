@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Daemon.
 
+0.08 (10/08/2009)
+    (ms) [RT 50326] Fixed insecure dependency error in tainted mode
+         by untainting the string obtained by appname().
+
 0.07 (03/24/2009)
     (ms) Applied patch by Sadrak [rt:44513] to check if Log4perl has
          already been initialized and skip the easy_init call in this

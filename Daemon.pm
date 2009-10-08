@@ -261,8 +261,12 @@ sub processes_running_by_name {
 ###########################################
 sub appname {
 ###########################################
-    my $base = basename($0);
-    return $base;
+    my $appname = basename($0);
+
+      # Make sure -T regards it as untainted now
+    ($appname) = ($appname =~ /([\w-]+)/);
+
+    return $appname;
 }
 
 ###########################################
