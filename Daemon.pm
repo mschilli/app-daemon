@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.07';
+our $VERSION = '0.08';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -30,20 +30,29 @@ sub cmd_line_parse {
         pod2usage();
     }
 
-    if(!defined $pidfile) {
-      $pidfile    = find_option('-p', 1) || ( '/tmp/' . $appname . ".pid" );
+    if(my $_pidfile = find_option('-p', 1)) {
+      $pidfile    = $_pidfile;
+    }
+    else {
+      $pidfile  ||= ( '/tmp/' . $appname . ".pid" );
     }
 
-    if(!defined $logfile) {
-      $logfile    = find_option('-l', 1) || ( '/tmp/' . $appname . ".log" );
+    if(my $_logfile = find_option('-l', 1)) {
+      $logfile    = $_logfile;
+    }
+    else {
+      $logfile  ||= ( '/tmp/' . $appname . ".log" );
     }
 
-    if(!defined $l4p_conf) {
-      $l4p_conf   = find_option('-l4p', 1);
+    if(my $_l4p_conf = find_option('-l4p', 1)) {
+      $l4p_conf   = $_l4p_conf;
     }
 
-    if(!defined $as_user) {
-      $as_user    = find_option('-u', 1) || "nobody";
+    if(my $_as_user = find_option('-u', 1)) {
+      $as_user    = $_as_user;
+    }
+    else {
+      $as_user  ||= 'nobody';
     }
 
     if($> != 0) {
@@ -51,14 +60,12 @@ sub cmd_line_parse {
         ($as_user) = getpwuid($>);
     }
 
-    if(!defined $background) {
-      $background = find_option('-X') ? 0 : 1,
-    }
+    $background = 1 if(!defined $background);
+    $background = find_option('-X') ? 0 : $background;
 
-    if(!defined $loglevel) {
-      $loglevel   = find_option('-v') ? $DEBUG : $INFO;
-      $loglevel   = $DEBUG if !$background;
-    }
+    $loglevel   = $background ? $INFO : $DEBUG
+      if(!defined $loglevel);
+    $loglevel   = find_option('-v') ? $DEBUG : $loglevel;
 
     for (qw(start stop status)) {
         if( find_option( $_ ) ) {
