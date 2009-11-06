@@ -4,6 +4,8 @@ Revision history for Perl extension App::Daemon.
     (ms) [RT 50884] Applied patch by Matthew Byng-Maddick allow overriding
          app-internal option settings by command line options. Order is now:
          command line > app-internal > App::Daemon internal
+    (ms) [RT 51066] Applied patch by Mike Whitaker to point stdin/out/err 
+         to /dev/null instead of closing them.
 
 0.07 (10/08/2009)
     (ms) Applied patch by Sadrak [rt:44513] to check if Log4perl has

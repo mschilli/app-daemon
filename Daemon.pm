@@ -191,9 +191,19 @@ sub detach {
     }
  
         # close std file descriptors
-    close(STDIN);
-    close(STDOUT);
-    close(STDERR);
+    if(-e "/dev/null") {
+        # On Unix, we want to point these file descriptors at /dev/null,
+        # so that any libary routines that try to read form stdin or
+        # write to stdout/err will have no effect (Stevens, APitUE, p. 426
+        # and [RT 51066].
+        open STDIN, '/dev/null';
+        open STDOUT, '>>/dev/null';
+        open STDERR, '>>/dev/null';
+    } else {
+        close(STDIN);
+        close(STDOUT);
+        close(STDERR);
+    }
 }
 
 ###########################################
