@@ -485,6 +485,8 @@ this instead:
     Running:     no
     Name match:  0
 
+=back
+
 =head2 Command Line Options
 
 =over 4
@@ -517,6 +519,8 @@ Defaults to C</tmp/[appname].pid>.
 Increase default Log4perl verbosity from $INFO to $DEBUG. Note that this
 option will be ignored if Log4perl is initialized independently or if
 a user-provided Log4perl configuration file is used.
+
+=back
 
 =head2 Setting Parameters
 
@@ -596,8 +600,6 @@ This will fork a child, terminate the parent and detach the child from
 the terminal. Issued from the command line, the program above will
 continue to run the code following the detach() call but return to the
 shell prompt immediately.
-
-=back
 
 =head1 AUTHOR
 
