@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.08
+    App::Daemon 0.09
 ######################################################################
 
 NAME
@@ -107,116 +107,109 @@ DESCRIPTION
             Name match:  0
 
   Command Line Options
-        -X  Foreground mode. Log messages go to the screen.
+    -X  Foreground mode. Log messages go to the screen.
 
-        -l logfile
-            Logfile to send Log4perl messages to in background mode.
-            Defaults to "/tmp/[appname].log".
+    -l logfile
+        Logfile to send Log4perl messages to in background mode. Defaults to
+        "/tmp/[appname].log".
 
-        -u as_user
-            User to run as if started as root. Defaults to 'nobody'.
+    -u as_user
+        User to run as if started as root. Defaults to 'nobody'.
 
-        -l4p l4p.conf
-            Path to Log4perl configuration file. Note that in this case the
-            -v option will be ignored.
+    -l4p l4p.conf
+        Path to Log4perl configuration file. Note that in this case the -v
+        option will be ignored.
 
-        -p pidfile
-            Where to save the pid of the started process. Defaults to
-            "/tmp/[appname].pid".
+    -p pidfile
+        Where to save the pid of the started process. Defaults to
+        "/tmp/[appname].pid".
 
-        -v  Increase default Log4perl verbosity from $INFO to $DEBUG. Note
-            that this option will be ignored if Log4perl is initialized
-            independently or if a user-provided Log4perl configuration file
-            is used.
+    -v  Increase default Log4perl verbosity from $INFO to $DEBUG. Note that
+        this option will be ignored if Log4perl is initialized independently
+        or if a user-provided Log4perl configuration file is used.
 
   Setting Parameters
-            Instead of setting paramteters like the logfile, the pidfile
-            etc. from the command line, you can directly manipulate
-            App::Daemon's global variables:
+    Instead of setting paramteters like the logfile, the pidfile etc. from
+    the command line, you can directly manipulate App::Daemon's global
+    variables:
 
-                use App::Daemon qw(daemonize);
+        use App::Daemon qw(daemonize);
 
-                $App::Daemon::logfile    = "mylog.log";
-                $App::Daemon::pidfile    = "mypid.log";
-                $App::Daemon::l4p_conf   = "myconf.l4p";
-                $App::Daemon::background = 1;
-                $App::Daemon::as_user    = "nobody";
+        $App::Daemon::logfile    = "mylog.log";
+        $App::Daemon::pidfile    = "mypid.log";
+        $App::Daemon::l4p_conf   = "myconf.l4p";
+        $App::Daemon::background = 1;
+        $App::Daemon::as_user    = "nobody";
 
-                use Log::Log4perl qw(:levels);
-                $App::Daemon::loglevel   = $DEBUG;
+        use Log::Log4perl qw(:levels);
+        $App::Daemon::loglevel   = $DEBUG;
 
-                daemonize();
+        daemonize();
 
   Application-specific command line options
-            If an application needs additional command line options, it can
-            use whatever is not yet taken by App::Daemon, as described
-            previously in the "Command Line Options" section.
+    If an application needs additional command line options, it can use
+    whatever is not yet taken by App::Daemon, as described previously in the
+    "Command Line Options" section.
 
-            However, it needs to make sure to remove these additional
-            options before calling daemonize(), or App::Daemon will
-            complain. To do this, create an options hash %opts and store
-            application-specific options in there while removing them from
-            @ARGV:
+    However, it needs to make sure to remove these additional options before
+    calling daemonize(), or App::Daemon will complain. To do this, create an
+    options hash %opts and store application-specific options in there while
+    removing them from @ARGV:
 
-                my %opts = ();
+        my %opts = ();
 
-                for my $opt (qw(k P U)) {
-                    my $v = App::Daemon::find_option( $opt, 1 );
-                    $opts{ $opt } = $v if defined $v;
-                }
+        for my $opt (qw(k P U)) {
+            my $v = App::Daemon::find_option( $opt, 1 );
+            $opts{ $opt } = $v if defined $v;
+        }
 
-            After this, options "-k", "-P", and "-U" will have disappeared
-            from @ARGV and can be checked in $opts{k}, $opts{P}, and
-            $opts{U}.
+    After this, options "-k", "-P", and "-U" will have disappeared from
+    @ARGV and can be checked in $opts{k}, $opts{P}, and $opts{U}.
 
   Gotchas
-            If the process is started as root but later drops permissions to
-            a non-priviledged user for security purposes, it's important
-            that logfiles are created with correct permissions.
+    If the process is started as root but later drops permissions to a
+    non-priviledged user for security purposes, it's important that logfiles
+    are created with correct permissions.
 
-            If they're created as root when the program starts, the
-            non-priviledged user won't be able to write to them later
-            (unless they're world-writable which is also undesirable because
-            of security concerns).
+    If they're created as root when the program starts, the non-priviledged
+    user won't be able to write to them later (unless they're world-writable
+    which is also undesirable because of security concerns).
 
-            The best strategy to handle this case is to specify the
-            non-priviledged user as the owner of the logfile in the Log4perl
-            configuration:
+    The best strategy to handle this case is to specify the non-priviledged
+    user as the owner of the logfile in the Log4perl configuration:
 
-                log4perl.logger = DEBUG, FileApp
-                log4perl.appender.FileApp = Log::Log4perl::Appender::File
-                log4perl.appender.FileApp.filename = /var/log/foo-app.log
-                log4perl.appender.FileApp.owner    = nobody
-                log4perl.appender.FileApp.layout   = PatternLayout
-                log4perl.appender.FileApp.layout.ConversionPattern = %d %m%n
+        log4perl.logger = DEBUG, FileApp
+        log4perl.appender.FileApp = Log::Log4perl::Appender::File
+        log4perl.appender.FileApp.filename = /var/log/foo-app.log
+        log4perl.appender.FileApp.owner    = nobody
+        log4perl.appender.FileApp.layout   = PatternLayout
+        log4perl.appender.FileApp.layout.ConversionPattern = %d %m%n
 
-            This way, the process starts up as root, creates the logfile if
-            it doesn't exist yet, and changes its owner to 'nobody'. Later,
-            when the process assumes the identity of the user 'nobody', it
-            will continue to write to the logfile without permission
-            problems.
+    This way, the process starts up as root, creates the logfile if it
+    doesn't exist yet, and changes its owner to 'nobody'. Later, when the
+    process assumes the identity of the user 'nobody', it will continue to
+    write to the logfile without permission problems.
 
   Detach only
-            If you want to create a daemon without the fancy command line
-            parsing and PID file checking functions, use
+    If you want to create a daemon without the fancy command line parsing
+    and PID file checking functions, use
 
-                use App::Daemon qw(detach);
-                detach();
-                # ... some code here
+        use App::Daemon qw(detach);
+        detach();
+        # ... some code here
 
-            This will fork a child, terminate the parent and detach the
-            child from the terminal. Issued from the command line, the
-            program above will continue to run the code following the
-            detach() call but return to the shell prompt immediately.
+    This will fork a child, terminate the parent and detach the child from
+    the terminal. Issued from the command line, the program above will
+    continue to run the code following the detach() call but return to the
+    shell prompt immediately.
 
 AUTHOR
-        Mike Schilli, cpan@perlmeister.com
+    Mike Schilli, cpan@perlmeister.com
 
 COPYRIGHT AND LICENSE
-        Copyright (C) 2008 by Mike Schilli
+    Copyright (C) 2008 by Mike Schilli
 
-        This library is free software; you can redistribute it and/or modify
-        it under the same terms as Perl itself, either Perl version 5.8.5
-        or, at your option, any later version of Perl 5 you may have
-        available.
+    This library is free software; you can redistribute it and/or modify it
+    under the same terms as Perl itself, either Perl version 5.8.5 or, at
+    your option, any later version of Perl 5 you may have available.
 

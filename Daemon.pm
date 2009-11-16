@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.08';
+our $VERSION = '0.09';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -554,7 +554,7 @@ while removing them from @ARGV:
 
     my %opts = ();
 
-    for my $opt (qw(k P U)) {
+    for my $opt (qw(-k -P -U)) {
         my $v = App::Daemon::find_option( $opt, 1 );
         $opts{ $opt } = $v if defined $v;
     }
