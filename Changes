@@ -3,6 +3,7 @@ Revision history for Perl extension App::Daemon.
 0.09 (not yet released)
     (ms) Fixed find_option example on manual page. Thanks to 
          Rolf Schaufelberger for pointing it out.
+    (ms) Added github repository link to Makefile.PL
 
 0.08 (11/05/2009)
     (ms) [RT 50884] Applied patch by Matthew Byng-Maddick allow overriding

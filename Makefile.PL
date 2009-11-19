@@ -14,6 +14,12 @@ WriteMakefile(
         Test::More         => 0,
         File::Temp         => 0,
     }, # e.g., Module::Name => 1.1
+    META_MERGE          => {
+        resources       => {
+            repository  => 
+              'http://github.com/mschilli/app-daemon',
+        },
+    },
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'Daemon.pm', # retrieve abstract from module
        AUTHOR         => 'Mike Schilli <m@perlmeister.com>') : ()),
