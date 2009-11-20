@@ -1,6 +1,15 @@
 use ExtUtils::MakeMaker;
 # See lib/ExtUtils/MakeMaker.pm for details of how to influence
 # the contents of the Makefile that is written.
+
+my $meta_merge = {
+    META_MERGE => {
+        resources => {
+            repository  => 'http://github.com/mschilli/app-daemon',
+        },
+    }
+};
+
 WriteMakefile(
     NAME              => 'App::Daemon',
     VERSION_FROM      => 'Daemon.pm', # finds $VERSION
@@ -14,12 +23,7 @@ WriteMakefile(
         Test::More         => 0,
         File::Temp         => 0,
     }, # e.g., Module::Name => 1.1
-    META_MERGE          => {
-        resources       => {
-            repository  => 
-              'http://github.com/mschilli/app-daemon',
-        },
-    },
+    $ExtUtils::MakeMaker::VERSION >= 6.50 ? (%$meta_merge) : (),
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
       (ABSTRACT_FROM  => 'Daemon.pm', # retrieve abstract from module
        AUTHOR         => 'Mike Schilli <m@perlmeister.com>') : ()),
