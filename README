@@ -158,7 +158,7 @@ DESCRIPTION
 
         my %opts = ();
 
-        for my $opt (qw(k P U)) {
+        for my $opt (qw(-k -P -U)) {
             my $v = App::Daemon::find_option( $opt, 1 );
             $opts{ $opt } = $v if defined $v;
         }

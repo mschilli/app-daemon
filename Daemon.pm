@@ -215,7 +215,7 @@ sub user_switch {
         if(! defined $name) {
             LOGDIE "Cannot switch to user $as_user";
         }
-        $> = $uid;
+        POSIX::setuid( $uid );
     }
 }
     
