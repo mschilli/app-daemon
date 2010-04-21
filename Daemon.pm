@@ -167,7 +167,7 @@ sub detach {
 
     umask(0);
  
-      # Make sure the child isn't killed when the uses closes the
+      # Make sure the child isn't killed when the user closes the
       # terminal session before the child detaches from the tty.
     $SIG{'HUP'} = 'IGNORE';
  
