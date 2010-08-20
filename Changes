@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
+0.10 (08/19/2010)
+    (ms) Writing pid file before dropping privileges (just like logfile).
+
 0.09 (04/09/2010)
     (ms) Fixed find_option example on manual page. Thanks to 
          Rolf Schaufelberger for pointing it out.

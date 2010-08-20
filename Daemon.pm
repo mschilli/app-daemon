@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.09';
+our $VERSION = '0.10';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -82,9 +82,6 @@ sub cmd_line_parse {
         DEBUG "Log4perl already initialized, doing nothing";
     } elsif( $l4p_conf ) {
         Log::Log4perl->init( $l4p_conf );
-    } elsif( !$background ) {
-        Log::Log4perl->easy_init({ level => $loglevel, 
-                                   layout => "%F{1}-%L: %m%n" });
     } elsif( $logfile ) {
         my $levelstring = Log::Log4perl::Level::to_level( $loglevel );
         Log::Log4perl->init(\ qq{
@@ -134,6 +131,7 @@ sub daemonize {
         if($action eq "restart") {
             sleep 1;
         } else {
+            INFO "Process $$ stopped by request.";
             exit 0;
         }
     }
@@ -153,10 +151,6 @@ sub daemonize {
         }
     };
     
-    INFO "Process ID is $$";
-    pid_file_write($$);
-    INFO "Written to $pidfile";
-
     return 1;
 }
 
@@ -186,6 +180,10 @@ sub detach {
         # process group leader of a new process group.
     POSIX::setsid();
  
+    INFO "Process ID is $$";
+    pid_file_write($$);
+    INFO "Written to $pidfile";
+
     if($as_user) {
         user_switch();
     }
