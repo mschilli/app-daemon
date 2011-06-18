@@ -6,7 +6,6 @@ our $VERSION = '0.11';
 
 use Getopt::Std;
 use Pod::Usage;
-use Log::Log4perl qw(:easy);
 use File::Basename;
 use Proc::ProcessTable;
 use Log::Log4perl qw(:easy);
