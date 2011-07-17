@@ -79,6 +79,8 @@ sub cmd_line_parse {
 
     if( Log::Log4perl->initialized() ) {
         DEBUG "Log4perl already initialized, doing nothing";
+    } elsif( $action eq "status" ) {
+        Log::Log4perl->easy_init( $loglevel );
     } elsif( $l4p_conf ) {
         Log::Log4perl->init( $l4p_conf );
     } elsif( $logfile ) {

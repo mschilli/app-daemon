@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
+0.12 (not yet released)
+   (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)
+
 0.11 (08/28/2010)
     (ms) Fixed test suite.
 
