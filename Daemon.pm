@@ -16,10 +16,19 @@ use Fcntl qw/:flock/;
 our @ISA = qw(Exporter);
 our @EXPORT_OK = qw(daemonize cmd_line_parse detach);
 
+use constant LSB_OK               => 0;
+use constant LSB_DEAD_PID_EXISTS  => 1;
+use constant LSB_DEAD_LOCK_EXISTS => 2;
+use constant LSB_NOT_RUNNING      => 3;
+use constant LSB_UNKNOWN          => 4;
+use constant ALREADY_RUNNING      => 150;
+
 our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
      $loglevel, $action, $appname);
 $action  = "";
 $appname = appname();
+
+our $kill_retries = 3;
 
 ###########################################
 sub cmd_line_parse {
@@ -112,33 +121,53 @@ sub daemonize {
     }
     
     if($action eq "status") {
-        status();
-        exit 0;
+        exit status();
     }
 
     if($action eq "stop" or $action eq "restart") {
+        my $exit_code = LSB_NOT_RUNNING;
+
         if(-f $pidfile) {
             my $pid = pid_file_read();
             if(kill 0, $pid) {
                 kill 2, $pid;
+                my $killed = 0;
+                for (1..$kill_retries) {
+                    if(!kill 0, $pid) {
+                        INFO "Process $pid stopped successfully.";
+                        unlink $pidfile or die "Can't remove $pidfile ($!)";
+                        $exit_code = LSB_OK;
+                        $killed++;
+                        last;
+                    }
+                    INFO "Process $pid still running, waiting ...";
+                    sleep 1;
+                }
+                if(! $killed) {
+                    ERROR "Process $pid still up, out of retries, giving up.";
+                    $exit_code = LSB_DEAD_PID_EXISTS;
+                }
             } else {
                 ERROR "Process $pid not running\n";
                 unlink $pidfile or die "Can't remove $pidfile ($!)";
+                $exit_code = LSB_NOT_RUNNING;
             }
         } else {
             ERROR "According to my pidfile, there's no instance ",
                   "of me running.";
+            $exit_code = LSB_NOT_RUNNING;
         }
+
         if($action eq "restart") {
             sleep 1;
         } else {
-            INFO "Process $$ stopped by request.";
-            exit 0;
+            exit $exit_code;
         }
     }
       
     if ( my $num = pid_file_process_running() ) {
-        LOGDIE "Already running: $num (pidfile=$pidfile)\n";
+        LOGWARN "Already running: $num (pidfile=$pidfile)\n";
+        exit ALREADY_RUNNING;
     }
 
     if( $background ) {
@@ -221,20 +250,35 @@ sub user_switch {
 ###########################################
 sub status {
 ###########################################
+
+      # Define exit codes according to 
+      # http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+    my $exit_code = LSB_UNKNOWN;
+
     print "Pid file:    $pidfile\n";
     if(-f $pidfile) {
         my $pid = pid_file_read();
+        my $running = process_running($pid);
         print "Pid in file: $pid\n";
-        print "Running:     ", process_running($pid) ? "yes" : "no", "\n";
+        print "Running:     ", $running ? "yes" : "no", "\n";
+        if($running) {
+              # see above
+            $exit_code = LSB_OK;
+        } else {
+              # see above
+            $exit_code = LSB_DEAD_PID_EXISTS;
+        }
     } else {
         print "No pidfile found\n";
+        $exit_code = LSB_NOT_RUNNING;
     }
     my @cmdlines = processes_running_by_name( $appname );
     print "Name match:  ", scalar @cmdlines, "\n";
     for(@cmdlines) {
         print "    ", $_, "\n";
     }
-    return 1;
+
+    return $exit_code;
 }
 
 
@@ -451,8 +495,8 @@ is run in foreground mode for testing purposes.
 =item stop
 
 will find the daemon's PID in the pidfile and send it a kill signal. It
-won't verify if this actually shut down the daemon or if it's immune to 
-the kill signal.
+will verify $App::Daemon::kill_retries times if the process is still alive,
+with 1-second sleeps in between.
 
 =item status
 
@@ -483,6 +527,26 @@ this instead:
     Pid in file: 14914
     Running:     no
     Name match:  0
+
+The status commands exit code complies with 
+
+    http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+
+and returns
+
+    0: if the process is up and running
+    1: the process is dead but the pid file still exists
+    3: the process is not running
+
+These constants are defined within App::Daemon to help writing test
+scripts:
+
+    use constant LSB_OK               => 0;
+    use constant LSB_DEAD_PID_EXISTS  => 1;
+    use constant LSB_DEAD_LOCK_EXISTS => 2;
+    use constant LSB_NOT_RUNNING      => 3;
+    use constant LSB_UNKNOWN          => 4;
+    use constant ALREADY_RUNNING      => 150;
 
 =back
 

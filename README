@@ -74,8 +74,8 @@ DESCRIPTION
 
     stop
         will find the daemon's PID in the pidfile and send it a kill signal.
-        It won't verify if this actually shut down the daemon or if it's
-        immune to the kill signal.
+        It will verify $App::Daemon::kill_retries times if the process is
+        still alive, with 1-second sleeps in between.
 
     status
         will print out diagnostics on what the status of the daemon is.
@@ -105,6 +105,26 @@ DESCRIPTION
             Pid in file: 14914
             Running:     no
             Name match:  0
+
+        The status commands exit code complies with
+
+            http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html
+
+        and returns
+
+            0: if the process is up and running
+            1: the process is dead but the pid file still exists
+            3: the process is not running
+
+        These constants are defined within App::Daemon to help writing test
+        scripts:
+
+            use constant LSB_OK               => 0;
+            use constant LSB_DEAD_PID_EXISTS  => 1;
+            use constant LSB_DEAD_LOCK_EXISTS => 2;
+            use constant LSB_NOT_RUNNING      => 3;
+            use constant LSB_UNKNOWN          => 4;
+            use constant ALREADY_RUNNING      => 150;
 
   Command Line Options
     -X  Foreground mode. Log messages go to the screen.
@@ -204,12 +224,17 @@ DESCRIPTION
     shell prompt immediately.
 
 AUTHOR
-    Mike Schilli, cpan@perlmeister.com
-
+        2011, Mike Schilli <cpan@perlmeister.com>
+    
 COPYRIGHT AND LICENSE
     Copyright (C) 2008 by Mike Schilli
 
     This library is free software; you can redistribute it and/or modify it
     under the same terms as Perl itself, either Perl version 5.8.5 or, at
     your option, any later version of Perl 5 you may have available.
+
+LICENSE
+    Copyright 2011 by Mike Schilli, all rights reserved. This program is
+    free software, you can redistribute it and/or modify it under the same
+    terms as Perl itself.
 

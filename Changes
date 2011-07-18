@@ -2,6 +2,13 @@ Revision history for Perl extension App::Daemon.
 
 0.12 (not yet released)
    (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)
+   (ms) 'stop' now verifies if the process is still up, and retries
+        $App::Daemon::kill_retries times (defaults to 3) times, with 
+        1-second sleeps in between.
+   (ms) Upon successful 'stop', pid file now gets removed (suggested by 
+        Brian Pitts)
+   (ms) 'status' now triggers exit codes
+        in compliance with http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html (suggested by Brian Pitts)
 
 0.11 (08/28/2010)
     (ms) Fixed test suite.

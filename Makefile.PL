@@ -22,6 +22,7 @@ WriteMakefile(
         File::Basename     => 0,
         Test::More         => 0,
         File::Temp         => 0,
+        Sysadm::Install    => 0.37,
     }, # e.g., Module::Name => 1.1
     $ExtUtils::MakeMaker::VERSION >= 6.50 ? (%$meta_merge) : (),
     ($] >= 5.005 ?     ## Add these new keywords supported since 5.005
