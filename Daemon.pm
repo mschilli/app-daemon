@@ -666,8 +666,8 @@ shell prompt immediately.
 
 =head1 AUTHOR
 
-Mike Schilli, cpan@perlmeister.com
-
+    2011, Mike Schilli <cpan@perlmeister.com>
+    
 =head1 COPYRIGHT AND LICENSE
 
 Copyright (C) 2008 by Mike Schilli
@@ -676,4 +676,11 @@ This library is free software; you can redistribute it and/or modify
 it under the same terms as Perl itself, either Perl version 5.8.5 or,
 at your option, any later version of Perl 5 you may have available.
 
-=cut
+=cut 
+
+=head1 LICENSE
+
+Copyright 2011 by Mike Schilli, all rights reserved.
+This program is free software, you can redistribute it and/or
+modify it under the same terms as Perl itself.
+

@@ -5,4 +5,5 @@ use strict;
     # Available at http://perlmeister.com/scripts
 use lib "$ENV{HOME}/perl-modules";
 use ModDevUtils;
+system("licensizer");
 ModDevUtils::release(0) or exit 0;
