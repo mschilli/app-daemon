@@ -193,7 +193,8 @@ sub detach {
 ###########################################
     my($as_user) = @_;
 
-    umask(0);
+      # newly created files have rw-r--r-- permissions by default
+    umask(0133);
  
       # Make sure the child isn't killed when the user closes the
       # terminal session before the child detaches from the tty.
