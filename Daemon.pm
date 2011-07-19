@@ -29,6 +29,7 @@ $action  = "";
 $appname = appname();
 
 our $kill_retries = 3;
+our $kill_sig = SIGTERM; # maps to 15 via POSIX.pm
 
 ###########################################
 sub cmd_line_parse {
@@ -130,7 +131,7 @@ sub daemonize {
         if(-f $pidfile) {
             my $pid = pid_file_read();
             if(kill 0, $pid) {
-                kill 2, $pid;
+                kill $kill_sig, $pid;
                 my $killed = 0;
                 for (1..$kill_retries) {
                     if(!kill 0, $pid) {
@@ -494,9 +495,17 @@ is run in foreground mode for testing purposes.
 
 =item stop
 
-will find the daemon's PID in the pidfile and send it a kill signal. It
+will find the daemon's PID in the pidfile and send it a SIGTERM signal. It
 will verify $App::Daemon::kill_retries times if the process is still alive,
 with 1-second sleeps in between.
+
+To have App::Daemon send a different signal than SIGTERM (e.g., SIGINT), set
+
+    use POSIX;
+    $App::Daemon::kill_sig = SIGINT;
+
+Note that his requires the numerial value (SIGINT via POSIX.pm), not a
+string like "SIGINT".
 
 =item status
 

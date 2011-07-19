@@ -9,6 +9,7 @@ Revision history for Perl extension App::Daemon.
         Brian Pitts)
    (ms) 'status' now triggers exit codes
         in compliance with http://refspecs.freestandards.org/LSB_3.1.1/LSB-Core-generic/LSB-Core-generic/iniscrptact.html (suggested by Brian Pitts)
+   (ms) using SIGTERM now instead of SIGINT to terminate a process
 
 0.11 (08/28/2010)
     (ms) Fixed test suite.
