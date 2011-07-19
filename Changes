@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Daemon.
 
+0.13 (07/18/2011)
+   (ms) [rt.cpan.org #69561] default log and pid files are now in the
+        current directory, not in /tmp by default because of security 
+        concerns.
+
 0.12 (07/18/2011)
    (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)
    (ms) 'stop' now verifies if the process is still up, and retries

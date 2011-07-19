@@ -24,9 +24,12 @@ use constant LSB_UNKNOWN          => 4;
 use constant ALREADY_RUNNING      => 150;
 
 our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
-     $loglevel, $action, $appname);
+     $loglevel, $action, $appname, $default_pid_dir, $default_log_dir);
 $action  = "";
 $appname = appname();
+
+$default_pid_dir = ".";
+$default_log_dir = ".";
 
 our $kill_retries = 3;
 our $kill_sig = SIGTERM; # maps to 15 via POSIX.pm
@@ -43,14 +46,14 @@ sub cmd_line_parse {
       $pidfile    = $_pidfile;
     }
     else {
-      $pidfile  ||= ( '/tmp/' . $appname . ".pid" );
+      $pidfile  ||= ( "$default_pid_dir/" . $appname . ".pid" );
     }
 
     if(my $_logfile = find_option('-l', 1)) {
       $logfile    = $_logfile;
     }
     else {
-      $logfile  ||= ( '/tmp/' . $appname . ".log" );
+      $logfile  ||= ( "$default_log_dir/" . $appname . ".log" );
     }
 
     if(my $_l4p_conf = find_option('-l4p', 1)) {
@@ -470,7 +473,7 @@ shows with the 'status' command if an instance is already running
 and which PID it has:
 
     ./my-app status
-    Pid file:    /tmp/tt.pid
+    Pid file:    ./tt.pid
     Pid in file: 14914
     Running:     no
     Name match:  0
@@ -512,7 +515,7 @@ string like "SIGINT".
 will print out diagnostics on what the status of the daemon is. Typically,
 the output look like this:
 
-    Pid file:    /tmp/tt.pid
+    Pid file:    ./tt.pid
     Pid in file: 15562
     Running:     yes
     Name match:  1
@@ -532,7 +535,7 @@ C<test.pl>, it will match lines like "perl -w test.pl" or
 If the process is no longer running, the status output might look like
 this instead:
 
-    Pid file:    /tmp/tt.pid
+    Pid file:    ./tt.pid
     Pid in file: 14914
     Running:     no
     Name match:  0
@@ -570,7 +573,7 @@ Foreground mode. Log messages go to the screen.
 =item -l logfile
 
 Logfile to send Log4perl messages to in background mode. Defaults
-to C</tmp/[appname].log>.
+to C<./[appname].log>.
 
 =item -u as_user
 
@@ -584,7 +587,7 @@ will be ignored.
 =item -p pidfile
 
 Where to save the pid of the started process.
-Defaults to C</tmp/[appname].pid>.
+Defaults to C<./[appname].pid>.
 
 =item -v
 
