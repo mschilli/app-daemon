@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.11
+    App::Daemon 0.12
 ######################################################################
 
 NAME
@@ -73,9 +73,18 @@ DESCRIPTION
         program is run in foreground mode for testing purposes.
 
     stop
-        will find the daemon's PID in the pidfile and send it a kill signal.
-        It will verify $App::Daemon::kill_retries times if the process is
-        still alive, with 1-second sleeps in between.
+        will find the daemon's PID in the pidfile and send it a SIGTERM
+        signal. It will verify $App::Daemon::kill_retries times if the
+        process is still alive, with 1-second sleeps in between.
+
+        To have App::Daemon send a different signal than SIGTERM (e.g.,
+        SIGINT), set
+
+            use POSIX;
+            $App::Daemon::kill_sig = SIGINT;
+
+        Note that his requires the numerial value (SIGINT via POSIX.pm), not
+        a string like "SIGINT".
 
     status
         will print out diagnostics on what the status of the daemon is.

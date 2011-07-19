@@ -1,4 +1,4 @@
-.cvsignore
+.licensizer.yml
 adm/release
 Changes
 Daemon.pm
@@ -6,6 +6,8 @@ eg/test-daemon
 eg/test-detach
 Makefile.PL
 MANIFEST
+MANIFEST.SKIP
 README
 t/001Basic.t
 t/002Params.t
+t/003CmdLine.t

@@ -1,6 +1,6 @@
 Revision history for Perl extension App::Daemon.
 
-0.12 (not yet released)
+0.12 (07/18/2011)
    (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)
    (ms) 'stop' now verifies if the process is still up, and retries
         $App::Daemon::kill_retries times (defaults to 3) times, with 
