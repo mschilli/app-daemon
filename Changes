@@ -1,11 +1,10 @@
 Revision history for Perl extension App::Daemon.
 
-0.13 (not released yet)
+0.13 (07/19/2011)
    (ms) [rt.cpan.org #69561] default log and pid files are now in the
         current directory, not in /tmp by default because of security 
         concerns.
-   (ms) [rt.cpan.org #69561] umask is set to 0133 now (was 0) to give
-        newly created files by the daemon rw-r--r-- permissions by default.
+   (ms) [rt.cpan.org #69561] not setting umask anymore
 
 0.12 (07/18/2011)
    (ms) 'status' now doesn't write to the logfile (suggested by Brian Pitts)

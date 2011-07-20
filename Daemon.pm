@@ -103,6 +103,8 @@ sub cmd_line_parse {
             log4perl.appender.FileApp = Log::Log4perl::Appender::File
             log4perl.appender.FileApp.filename = $logfile
             log4perl.appender.FileApp.owner    = $as_user
+              # this umask is only temporary
+            log4perl.appender.FileApp.umask    = 0133
             log4perl.appender.FileApp.layout   = PatternLayout
             log4perl.appender.FileApp.layout.ConversionPattern = %d %m%n
         });
@@ -370,7 +372,8 @@ sub pid_file_write {
 ###########################################
     my($pid) = @_;
 
-    open FILE, "+>$pidfile" or LOGDIE "Cannot open pidfile $pidfile";
+    sysopen FILE, $pidfile, O_RDWR|O_CREAT, 0644 or
+        LOGDIE "Cannot open pidfile $pidfile";
     flock FILE, LOCK_EX;
     seek(FILE, 0, 0);
     print FILE "$pid\n";
@@ -493,9 +496,18 @@ will start up the daemon. "start" itself is optional, as this is the
 default action, 
         
         $ ./my-app
+        $
         
-will also run the 'start' action. If the -X option is given, the program
-is run in foreground mode for testing purposes.
+will also run the 'start' action. By default, it will create a pid file
+and a log file in the current directory
+(named C<my-app.pid> and C<my-app.log>. To change these locations, see
+the C<-l> and C<-p> options.
+
+If the -X option is given, the program
+is running in foreground mode for testing purposes:
+
+        $ ./my-app -X
+        ...
 
 =item stop
 
@@ -514,7 +526,7 @@ string like "SIGINT".
 =item status
 
 will print out diagnostics on what the status of the daemon is. Typically,
-the output look like this:
+the output looks like this:
 
     Pid file:    ./tt.pid
     Pid in file: 15562
@@ -574,7 +586,9 @@ Foreground mode. Log messages go to the screen.
 =item -l logfile
 
 Logfile to send Log4perl messages to in background mode. Defaults
-to C<./[appname].log>.
+to C<./[appname].log>. Note that having a logfile in the current directory
+doesn't make sense except for testing environments, make sure to set this
+to somewhere within C</var/log> for production use.
 
 =item -u as_user
 
@@ -589,6 +603,10 @@ will be ignored.
 
 Where to save the pid of the started process.
 Defaults to C<./[appname].pid>.
+Note that 
+having a pidfile in the current directory
+doesn't make sense except for testing environments, make sure to set this
+to somewhere within C</var/run> for production use.
 
 =item -v
 
