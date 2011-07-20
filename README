@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.12
+    App::Daemon 0.13
 ######################################################################
 
 NAME
@@ -55,7 +55,7 @@ DESCRIPTION
         and which PID it has:
 
             ./my-app status
-            Pid file:    /tmp/tt.pid
+            Pid file:    ./tt.pid
             Pid in file: 14914
             Running:     no
             Name match:  0
@@ -68,9 +68,18 @@ DESCRIPTION
         default action,
 
                 $ ./my-app
-        
-        will also run the 'start' action. If the -X option is given, the
-        program is run in foreground mode for testing purposes.
+                $
+
+        will also run the 'start' action. By default, it will create a pid
+        file and a log file in the current directory (named "my-app.pid" and
+        "my-app.log". To change these locations, see the "-l" and "-p"
+        options.
+
+        If the -X option is given, the program is running in foreground mode
+        for testing purposes:
+
+                $ ./my-app -X
+                ...
 
     stop
         will find the daemon's PID in the pidfile and send it a SIGTERM
@@ -88,9 +97,9 @@ DESCRIPTION
 
     status
         will print out diagnostics on what the status of the daemon is.
-        Typically, the output look like this:
+        Typically, the output looks like this:
 
-            Pid file:    /tmp/tt.pid
+            Pid file:    ./tt.pid
             Pid in file: 15562
             Running:     yes
             Name match:  1
@@ -110,7 +119,7 @@ DESCRIPTION
         If the process is no longer running, the status output might look
         like this instead:
 
-            Pid file:    /tmp/tt.pid
+            Pid file:    ./tt.pid
             Pid in file: 14914
             Running:     no
             Name match:  0
@@ -140,7 +149,9 @@ DESCRIPTION
 
     -l logfile
         Logfile to send Log4perl messages to in background mode. Defaults to
-        "/tmp/[appname].log".
+        "./[appname].log". Note that having a logfile in the current
+        directory doesn't make sense except for testing environments, make
+        sure to set this to somewhere within "/var/log" for production use.
 
     -u as_user
         User to run as if started as root. Defaults to 'nobody'.
@@ -151,7 +162,9 @@ DESCRIPTION
 
     -p pidfile
         Where to save the pid of the started process. Defaults to
-        "/tmp/[appname].pid".
+        "./[appname].pid". Note that having a pidfile in the current
+        directory doesn't make sense except for testing environments, make
+        sure to set this to somewhere within "/var/run" for production use.
 
     -v  Increase default Log4perl verbosity from $INFO to $DEBUG. Note that
         this option will be ignored if Log4perl is initialized independently
@@ -234,13 +247,6 @@ DESCRIPTION
 
 AUTHOR
         2011, Mike Schilli <cpan@perlmeister.com>
-    
-COPYRIGHT AND LICENSE
-    Copyright (C) 2008 by Mike Schilli
-
-    This library is free software; you can redistribute it and/or modify it
-    under the same terms as Perl itself, either Perl version 5.8.5 or, at
-    your option, any later version of Perl 5 you may have available.
 
 LICENSE
     Copyright 2011 by Mike Schilli, all rights reserved. This program is

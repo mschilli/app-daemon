@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.12';
+our $VERSION = '0.13';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -699,16 +699,6 @@ shell prompt immediately.
 
     2011, Mike Schilli <cpan@perlmeister.com>
     
-=head1 COPYRIGHT AND LICENSE
-
-Copyright (C) 2008 by Mike Schilli
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself, either Perl version 5.8.5 or,
-at your option, any later version of Perl 5 you may have available.
-
-=cut 
-
 =head1 LICENSE
 
 Copyright 2011 by Mike Schilli, all rights reserved.
