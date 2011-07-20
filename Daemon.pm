@@ -697,11 +697,11 @@ shell prompt immediately.
 
 =head1 AUTHOR
 
-    2011, Mike Schilli <cpan@perlmeister.com>
+    2008, Mike Schilli <cpan@perlmeister.com>
     
 =head1 LICENSE
 
-Copyright 2011 by Mike Schilli, all rights reserved.
+Copyright 2008-2011 by Mike Schilli, all rights reserved.
 This program is free software, you can redistribute it and/or
 modify it under the same terms as Perl itself.
 
