@@ -79,14 +79,14 @@ sub cmd_line_parse {
       if(!defined $loglevel);
     $loglevel   = find_option('-v') ? $DEBUG : $loglevel;
 
-    for (qw(start stop status)) {
+    for (qw(start stop restart status)) {
         if( find_option( $_ ) ) {
             $action = $_;
             last;
         }
     }
     
-    if($action eq "stop" or $action eq "restart") {
+    if($action eq "stop" or $action eq "status") {
         $background = 0;
     }
 

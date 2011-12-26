@@ -1,5 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
+0.14 (12/25/2011)
+   (ms) [RT 72835] Patch by Peter to fix 'restart'.
+
 0.13 (07/19/2011)
    (ms) [rt.cpan.org #69561] default log and pid files are now in the
         current directory, not in /tmp by default because of security 
