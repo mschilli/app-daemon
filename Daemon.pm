@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -195,8 +195,8 @@ sub detach {
 ###########################################
     my($as_user) = @_;
 
-      # newly created files have rw-r--r-- permissions by default
-    umask(0133);
+      # [rt #75219]
+    umask(0);
  
       # Make sure the child isn't killed when the user closes the
       # terminal session before the child detaches from the tty.
@@ -701,7 +701,7 @@ shell prompt immediately.
     
 =head1 LICENSE
 
-Copyright 2008-2011 by Mike Schilli, all rights reserved.
+Copyright 2008-2012 by Mike Schilli, all rights reserved.
 This program is free software, you can redistribute it and/or
 modify it under the same terms as Perl itself.
 

@@ -1,7 +1,12 @@
 Revision history for Perl extension App::Daemon.
 
+0.15 (02/22/2012)
+   (ms) [rt.cpan.org #75219] Umask is now set to 0 to allow OS calls 
+        to provide their own permission masks and not to depend on the 
+        umask of the caller.
+
 0.14 (12/25/2011)
-   (ms) [RT 72835] Patch by Peter to fix 'restart'.
+   (ms) [rt.cpan.org #72835] Patch by Peter to fix 'restart'.
 
 0.13 (07/19/2011)
    (ms) [rt.cpan.org #69561] default log and pid files are now in the

@@ -1,5 +1,5 @@
 ######################################################################
-    App::Daemon 0.14
+    App::Daemon 0.15
 ######################################################################
 
 NAME
@@ -249,7 +249,7 @@ AUTHOR
         2008, Mike Schilli <cpan@perlmeister.com>
 
 LICENSE
-    Copyright 2008-2011 by Mike Schilli, all rights reserved. This program
+    Copyright 2008-2012 by Mike Schilli, all rights reserved. This program
     is free software, you can redistribute it and/or modify it under the
     same terms as Perl itself.
 
