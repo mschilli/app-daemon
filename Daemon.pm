@@ -180,9 +180,26 @@ sub daemonize {
         detach( $as_user );
     }
 
+    my $prev_sig   = $SIG{__DIE__};
+    my $master_pid = $$;
+
+    DEBUG "Defining die handler";
+
     $SIG{__DIE__} = sub { 
-          # Make sure it's not an eval{} triggering the handler.
-        if(defined $^S && $^S==0) {
+        DEBUG __PACKAGE__, " die handler triggered.";
+          # In case we had a previously defined signal handler, call
+          # it first and add ours to the end of the chain.
+        $prev_sig->(@_) if ($prev_sig);
+
+        if( $master_pid != $$ ) {
+              # Verify that it's the main process calling the
+              # handler and not a previously forked child.
+            DEBUG "Die handler called for pid $$ but master pid is $master_pid";
+        } elsif( !defined $^S or $^S != 0 ) {
+              # Make sure it's not an eval{} triggering the handler.
+            DEBUG "Die handler called by eval. Ignored.";
+        } else {
+            DEBUG "Die handler removes pidfile $pidfile";
             unlink $pidfile or warn "Cannot remove $pidfile";
         }
     };

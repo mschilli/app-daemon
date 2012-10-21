@@ -1,5 +1,10 @@
 Revision history for Perl extension App::Daemon.
 
+0.16 (10/21/2012)
+   (ms) [rt.cpan.org #44462] forked children now don't remove the master's
+        pid file anymore when they exit. Thanks to Felix Ostmann and
+        Vadim Troshchinskiy for proposing the fix.
+
 0.15 (02/22/2012)
    (ms) [rt.cpan.org #75219] Umask is now set to 0 to allow OS calls 
         to provide their own permission masks and not to depend on the 
