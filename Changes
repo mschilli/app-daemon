@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Daemon.
 
+0.17 (10/30/2012)
+   (ms) [rt.cpan.org #75931] To address problems with Proc::ProcessTable 
+        on some platforms, changed process_is_running() to use POSIX methods
+        only. Proc::ProcessTable is now optional and only required when
+        using process_running_by_name().
+
 0.16 (10/21/2012)
    (ms) [rt.cpan.org #44462] forked children now don't remove the master's
         pid file anymore when they exit. Thanks to Felix Ostmann and

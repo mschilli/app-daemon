@@ -2,12 +2,11 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.16';
+our $VERSION = '0.17';
 
 use Getopt::Std;
 use Pod::Usage;
 use File::Basename;
-use Proc::ProcessTable;
 use Log::Log4perl qw(:easy);
 use POSIX;
 use Exporter;
@@ -311,14 +310,21 @@ sub process_running {
 ###########################################
     my($pid) = @_;
 
-    # kill(0,pid) doesn't work if we're checking a process running on
-    # different uid, so we need this.
+    my $rc = kill( 0, $pid );
 
-    my $t = Proc::ProcessTable->new();
-
-    foreach my $p ( @{$t->table} ){
-        return 1 if $p->pid() == $pid;
+    if( $rc ) {
+          # pseudo signal got delivered, process exists
+        return 1;
+    } elsif( $! == ESRCH ) {
+          # process doesn't exist
+        return 0;
+    } elsif( $! == EPERM ) {
+          # process does exist, but we don't have permission to
+          # send the signal
+        return 1;
     }
+
+      # Weirdness ensued.
     return 0;
 }
 
@@ -326,6 +332,8 @@ sub process_running {
 sub processes_running_by_name {
 ###########################################
     my($name) = @_;
+
+    require Proc::ProcessTable;
 
     $name = basename($name);
     my @procs = ();
