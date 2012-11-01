@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.17';
+our $VERSION = '0.18';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -295,10 +295,13 @@ sub status {
         print "No pidfile found\n";
         $exit_code = LSB_NOT_RUNNING;
     }
-    my @cmdlines = processes_running_by_name( $appname );
-    print "Name match:  ", scalar @cmdlines, "\n";
-    for(@cmdlines) {
-        print "    ", $_, "\n";
+
+    if( proc_processtable_available() ) {
+        my @cmdlines = processes_running_by_name( $appname );
+        print "Name match:  ", scalar @cmdlines, "\n";
+        for(@cmdlines) {
+            print "    ", $_, "\n";
+        }
     }
 
     return $exit_code;
@@ -431,6 +434,20 @@ sub pid_file_process_running {
     }
 
     return undef;
+}
+
+###########################################
+sub proc_processtable_available {
+###########################################
+    my $module = "Proc::ProcessTable";
+
+    eval "require $module;";
+
+    if( $@ ) {
+        return 0;
+    }
+
+    return 1;
 }
 
 1;

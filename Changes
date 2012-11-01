@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Daemon.
 
+0.18 (10/31/2012)
+   (ms) [rt.cpan.org #75931] Fixed previous release to actually work with
+        Proc::ProcessTable missing.
+
 0.17 (10/30/2012)
    (ms) [rt.cpan.org #75931] To address problems with Proc::ProcessTable 
         on some platforms, changed process_is_running() to use POSIX methods
