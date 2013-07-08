@@ -1,5 +1,9 @@
 Revision history for Perl extension App::Daemon.
 
+0.19 (07/07/2013)
+   (ms) [rt.cpan.org #86762] Peter noticed that App::Daemon's fork()
+        check was incorrect. Fixed.
+
 0.18 (10/31/2012)
    (ms) [rt.cpan.org #75931] Fixed previous release to actually work with
         Proc::ProcessTable missing.

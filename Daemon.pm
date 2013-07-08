@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.18';
+our $VERSION = '0.19';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -220,7 +220,7 @@ sub detach {
  
     my $child = fork();
  
-    if($child < 0) {
+    if(! defined $child ) {
         LOGDIE "Fork failed ($!)";
     }
  
