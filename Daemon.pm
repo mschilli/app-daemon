@@ -32,6 +32,7 @@ $default_log_dir = ".";
 
 our $kill_retries = 3;
 our $kill_sig = SIGTERM; # maps to 15 via POSIX.pm
+our $check_name = 1;
 
 ###########################################
 sub cmd_line_parse {
@@ -134,7 +135,7 @@ sub daemonize {
 
         if(-f $pidfile) {
             my $pid = pid_file_read();
-            if(kill 0, $pid) {
+            if( process_running($pid) ) {
                 kill $kill_sig, $pid;
                 my $killed = 0;
                 for (1..$kill_retries) {
@@ -314,20 +315,56 @@ sub process_running {
     my($pid) = @_;
 
     my $rc = kill( 0, $pid );
-
     if( $rc ) {
           # pseudo signal got delivered, process exists
-        return 1;
+        return check_name($pid);
     } elsif( $! == ESRCH ) {
           # process doesn't exist
         return 0;
     } elsif( $! == EPERM ) {
           # process does exist, but we don't have permission to
           # send the signal
-        return 1;
+        return check_name($pid);
     }
 
       # Weirdness ensued.
+    return 0;
+}
+
+###########################################
+sub check_name {
+###########################################
+    my($pid) = @_;
+    my $procname = "";
+    my $myname = appname();
+
+    if( !$check_name ) {
+        DEBUG "Not checking process names";
+        return 1;
+    }
+
+    if( !proc_processtable_available() ) {
+        WARN "Process name checking requires Proc::ProcessTable";
+        return 1;
+    }
+
+    require Proc::ProcessTable;
+    my $t = Proc::ProcessTable->new();
+
+    DEBUG "Checking process name for pid $pid";
+
+    foreach my $p ( @{$t->table} ) {
+        if ( $p->pid() == $pid ) {
+            $procname = appname($p->fname());
+
+            if ( $procname eq $myname ) {
+                 DEBUG "Process name for pid $pid matches";
+                 return 1;
+            }
+        }
+    }
+
+    INFO "Process name doesn't match. Running process is '$procname', current process is '$myname'.";
     return 0;
 }
 
@@ -356,7 +393,7 @@ sub processes_running_by_name {
 ###########################################
 sub appname {
 ###########################################
-    my $appname = basename($0);
+    my $appname = basename(shift || $0);
 
       # Make sure -T regards it as untainted now
     ($appname) = ($appname =~ /([\w-]+)/);
@@ -671,6 +708,7 @@ variables:
     $App::Daemon::l4p_conf   = "myconf.l4p";
     $App::Daemon::background = 1;
     $App::Daemon::as_user    = "nobody";
+    $App::Daemon::check_name = 1;
 
     use Log::Log4perl qw(:levels);
     $App::Daemon::loglevel   = $DEBUG;
