@@ -453,7 +453,8 @@ sub pid_file_read {
     my $pid = <FILE>;
     chomp $pid if defined $pid;
     close FILE;
-    return $pid;
+    $pid =~ /^(\d+)$/; # Untaint
+    return $1;
 }
 
 ###########################################
