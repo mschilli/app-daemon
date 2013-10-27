@@ -701,6 +701,10 @@ After this, options C<-k>, C<-P>, and C<-U> will have disappeared from
 
 =head2 Gotchas
 
+=over 4
+
+=item Log File Permissions
+
 If the process is started as root but later drops permissions to a
 non-priviledged user for security purposes, it's important that 
 logfiles are created with correct permissions.
@@ -723,6 +727,29 @@ This way, the process starts up as root, creates the logfile if it
 doesn't exist yet, and changes its owner to 'nobody'. Later, when the
 process assumes the identity of the user 'nobody', it will continue
 to write to the logfile without permission problems.
+
+=item Log4perl Categories
+
+Note that App::Daemon is logging messages in Log4perl's App::Daemon 
+namespace. So, if you're running your own Log4perl configuration and
+define a root logger like
+
+    log4perl.logger=DEBUG, appendername
+
+then App::Daemon's messages will bubble up to it and be visible in
+the output. If you don't want that, either use
+
+    log4perl.logger.My.App=DEBUG, appendername
+
+to explicitly enable verbose logging in your application namespace
+(and not in App::Daemon's) or tone down App::Daemon's verbosity via
+
+    log4perl.logger.App.Daemon=ERROR
+
+explicitly. If you want more details on basic Log4perl features,
+check out the L<Log::Log4perl> manual page.
+
+=back
 
 =head2 Detach only
 
