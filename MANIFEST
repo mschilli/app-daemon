@@ -13,3 +13,4 @@ t/001Basic.t
 t/002Params.t
 t/003CmdLine.t
 t/004Pidfile.t
+t/005Detach.t

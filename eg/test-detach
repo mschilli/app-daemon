@@ -1,11 +1,15 @@
 #!/usr/local/bin/perl -w
 use strict;
 
+my( $done_file ) = @ARGV;
+
+die "usage: $0 done_file" if !defined $done_file;
+
      # Program:
 use App::Daemon qw( detach );
 detach();
-sleep(5);
+sleep(1);
 
-open FILE, ">foo.txt" or die;
-print FILE "Waaah!\n";
+open FILE, ">", $done_file or die;
+print FILE "Done\n";
 close FILE;

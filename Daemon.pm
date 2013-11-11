@@ -2,7 +2,7 @@ package App::Daemon;
 use strict;
 use warnings;
 
-our $VERSION = '0.19';
+our $VERSION = '0.20';
 
 use Getopt::Std;
 use Pod::Usage;
@@ -233,9 +233,11 @@ sub detach {
         # process group leader of a new process group.
     POSIX::setsid();
  
-    INFO "Process ID is $$";
-    pid_file_write($$);
-    INFO "Written to $pidfile";
+    if( defined $pidfile ) {
+        INFO "Process ID is $$";
+        pid_file_write($$);
+        INFO "Written to $pidfile";
+    }
 
     if($as_user) {
         user_switch();
