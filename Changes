@@ -1,6 +1,6 @@
 Revision history for Perl extension App::Daemon.
 
-0.20 (07/07/2013)
+0.20 (11/11/2013)
    (ms) [rt.cpan.org #61428] Fixed bug in detach() which no longer attempts
         to write to a non-existing pid file.
 
