@@ -22,7 +22,7 @@ use constant LSB_NOT_RUNNING      => 3;
 use constant LSB_UNKNOWN          => 4;
 use constant ALREADY_RUNNING      => 150;
 
-our ($pidfile, $logfile, $l4p_conf, $as_user, $background, 
+our ($pidfile, $logfile, $l4p_conf, $as_user, $as_group, $background,
      $loglevel, $action, $appname, $default_pid_dir, $default_log_dir);
 $action  = "";
 $appname = appname();
@@ -66,9 +66,17 @@ sub cmd_line_parse {
       $as_user  ||= 'nobody';
     }
 
+    if(my $_as_group = find_option('-g', 1)) {
+      $as_group   = $_as_group;
+    }
+    else {
+      $as_group ||= 'nogroup';
+    }
+
     if($> != 0) {
-          # Not root? Then we're ourselves
-        ($as_user) = getpwuid($>);
+        # Not root? Then we're ourselves
+        ($as_user)  = getpwuid($>);
+	($as_group) = getgrgid(POSIX::getgid());
     }
 
     $background = 1 if(!defined $background);
@@ -178,7 +186,7 @@ sub daemonize {
     if( $background ) {
         detach( $as_user );
     } elsif ($as_user) {
-	user_switch();
+	id_switch();
     }
 
     my $prev_sig   = $SIG{__DIE__};
@@ -242,7 +250,7 @@ sub detach {
     }
 
     if($as_user) {
-        user_switch();
+        id_switch();
     }
  
         # close std file descriptors
@@ -262,10 +270,20 @@ sub detach {
 }
 
 ###########################################
-sub user_switch {
+sub id_switch {
 ###########################################
     if($> == 0) {
-        # If we're root, become the user set as 'as_user';
+        # If we're root, become user set as 'as_user' and the group in
+        # 'as_group'.
+
+	# Set the group first because it only works when still root
+	my ($group,undef,$gid)  = getgrnam($as_group);
+
+	if(! defined $group) {
+	    LOGDIE "Cannot switch to group $as_group";
+	}
+	POSIX::setgid($gid);
+
         my ($name,$passwd,$uid) = getpwnam($as_user);
         if(! defined $name) {
             LOGDIE "Cannot switch to user $as_user";
@@ -641,6 +659,10 @@ to somewhere within C</var/log> for production use.
 
 User to run as if started as root. Defaults to 'nobody'.
 
+=item -g as_group
+
+Group to run as if started as root.  Defaults to 'nogroup'.
+
 =item -l4p l4p.conf
 
 Path to Log4perl configuration file. Note that in this case the -v option 
@@ -676,6 +698,7 @@ variables:
     $App::Daemon::l4p_conf   = "myconf.l4p";
     $App::Daemon::background = 1;
     $App::Daemon::as_user    = "nobody";
+    $App::Daemon::as_group   = "nogroup";
 
     use Log::Log4perl qw(:levels);
     $App::Daemon::loglevel   = $DEBUG;
