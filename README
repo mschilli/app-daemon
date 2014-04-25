@@ -156,6 +156,9 @@ DESCRIPTION
     -u as_user
         User to run as if started as root. Defaults to 'nobody'.
 
+    -g as_group
+        Group to run as if started as root. Defaults to 'nogroup'.
+
     -l4p l4p.conf
         Path to Log4perl configuration file. Note that in this case the -v
         option will be ignored.
@@ -182,6 +185,7 @@ DESCRIPTION
         $App::Daemon::l4p_conf   = "myconf.l4p";
         $App::Daemon::background = 1;
         $App::Daemon::as_user    = "nobody";
+        $App::Daemon::as_group   = "nogroup";
 
         use Log::Log4perl qw(:levels);
         $App::Daemon::loglevel   = $DEBUG;
