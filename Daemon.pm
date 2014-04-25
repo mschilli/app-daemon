@@ -177,6 +177,8 @@ sub daemonize {
 
     if( $background ) {
         detach( $as_user );
+    } elsif ($as_user) {
+	user_switch();
     }
 
     my $prev_sig   = $SIG{__DIE__};
