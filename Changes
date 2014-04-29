@@ -1,5 +1,11 @@
 Revision history for Perl extension App::Daemon.
 
+0.21 (04/28/2014)
+   (ms) Nicolai Langfeldt added -g option to switch to specified group 
+        when app was started as root.
+   (ms) Makefile.PL now dies on Win32 to save the CPAN smoke testers 
+        some grief with hanging tests ([rt.cpan.org #81980])
+
 0.20 (11/11/2013)
    (ms) [rt.cpan.org #61428] Fixed bug in detach() which no longer attempts
         to write to a non-existing pid file.
