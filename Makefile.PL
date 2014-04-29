@@ -10,6 +10,10 @@ my $meta_merge = {
     }
 };
 
+if( $^O eq "MSWin32" ) {
+    die "$^O: OS unsupported";
+}
+
 WriteMakefile(
     NAME              => 'App::Daemon',
     VERSION_FROM      => 'Daemon.pm', # finds $VERSION
