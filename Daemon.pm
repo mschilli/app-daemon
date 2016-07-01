@@ -519,7 +519,7 @@ and 'daemonize' it that way. That means, that if you write
     sleep(10);
 
 you'll get a script that, when called from the command line, returns 
-immediatly, but continues to run as a daemon for 10 seconds.
+immediately, but continues to run as a daemon for 10 seconds.
 
 Along with the
 common features offered by similar modules on CPAN, it

@@ -1,6 +1,8 @@
 Revision history for Perl extension App::Daemon.
 
 0.23 (not yet released)
+   (ms) [rt.cpan.org #115760] Salvatore Bonaccorso fixed a typo in the 
+        manual page.
    (ms) Carsten Kahlmeier noticed that File::Pid is no longer a dependency,
         removed from the list.
 
